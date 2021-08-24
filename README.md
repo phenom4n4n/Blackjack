@@ -1,2 +1,2 @@
 # Blackjack
-A simpler java Blackjack shell game.
+A simple java Blackjack shell game.
