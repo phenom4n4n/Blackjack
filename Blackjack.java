@@ -1,4 +1,3 @@
-import java.lang.StringBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ListIterator;
@@ -51,7 +50,11 @@ class BlackjackGame {
         deal(dealer);
         deal(user);
         deal(dealer);
-        playTurn();
+        try {
+            playTurn();            
+        } catch (UserBustedException exc) {
+            println(exc.getMessage(), 1);
+        }
     }
 
     public void deal(Player player) {
@@ -59,21 +62,31 @@ class BlackjackGame {
         player.deal(card);
     }
 
-    private void validateCards() {
+    private void validateCards() throws UserBustedException {
         int value = user.getCardsValue();
         if (value > 21) {
-            println("You busted! (" + value + ")", 1);
-            user.setBusted(true);
+            throw new UserBustedException(user, value);
         }
     }
 
-    private void playTurn() {
+    private void playTurn() throws UserBustedException {
         validateCards();
         while (user.canPlay()) {
             user.playTurn();
             validateCards();
         }
         dealer.playTurn();
+        int userValue = user.getCardsValue();
+        int dealerValue = dealer.getCardsValue();
+        if (userValue == dealerValue) {
+            println("You tied with the dealer.", 0.5);
+        } else if (userValue > dealerValue) {
+            println("You won!", 0.5);
+        } else {
+            println("The dealer won :(", 0.5);
+        }
+        println("Dealer card value: " + dealerValue, 0.25);
+        println("User card value: " + userValue, 0.25);
     }
 
     public String toString() {
@@ -91,7 +104,8 @@ class BlackjackGame {
 
     public void revealHoleCard() {
         _holeCardRevealed = true;
-        println("The dealer reveals the hole card!\n" + dealer.toString(), 1);
+        println("The dealer reveals the hole card!", 0.5);
+        println(dealer.toString(), 0.5);
     }
 
     public boolean holeCardRevealed() {
@@ -282,5 +296,14 @@ class User extends Player {
             BlackjackGame.println("Invalid choice.", 0.25);
             playTurn();
         }
+    }
+}
+
+class UserBustedException extends Exception {
+    String message;
+
+    public UserBustedException(User user, int cardsValue) {
+        super("You busted! (" + cardsValue + ")");
+        user.setBusted(true);
     }
 }
