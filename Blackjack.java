@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.ListIterator;
 import java.util.Scanner;
 
@@ -199,6 +200,23 @@ class Player {
     public void deal(Card card) {
         cards.add(card);
     }
+
+    public void sortCards() {
+        Comparator comparator = new Comparator<Card>(){
+            public int compare(Card card1, Card card2) {
+                int card1Value = card1.getValue();
+                int card2Value = card2.getValue();
+                if (card1Value > card2Value) {
+                    return -1;
+                } else if (card1Value < card2Value) {
+                    return 1;
+                } else {
+                    return card1.name.compareTo(card2.name);
+                }
+            }
+        };
+        Collections.sort(cards, comparator);
+    }
 }
 
 class Dealer extends Player {
@@ -254,6 +272,7 @@ class User extends Player {
 
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder("Your cards:\n");
+        sortCards();
         for (Card card : cards) {
             stringBuilder.append(card.toPrettyString()).append(" ");
         }
